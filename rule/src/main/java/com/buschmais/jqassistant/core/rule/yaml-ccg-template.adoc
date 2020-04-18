@@ -33,12 +33,12 @@ jQAssistants's XML Schema.
 
 | `deprecated`
 | 0..1
-| Marks a {rule-type} as deprecated. A given text should be used to inform the
+| Marks a {rule-type} as deprecated. The given text should be used to inform the
   user of the deprecation and the consequences of the deprecation.
 
 | `description`
 | 0..1
-| Description of the {rule-type}.  Intended to be shown to the user in case
+| Description of the {rule-type}. Intended to be shown to the user in case
   the verification of the rule failed and to document the rule itself.
 
 | `language`
@@ -209,13 +209,50 @@ result verification via row counting will be performed.
 | 0..1
 | Allowed maximal inclusive number of rows in the result set of a {rule-type}.
 
+  In case of the result verification for a constraint, the default value
+  for `max` is `0`. For a concept `max` has no default value and the
+  result set contain any number for rows.
+
 | `min`
 | 0..1
 | Required minimal inclusive number of rows in the result set of a {rule-type}.
 
+  In case of the result verification for a contraint, the default value
+  for `min` and for `max` is `0`.  For a concept the default value of
+  `min` is `1`.
 
 |===
 
-// todo Document the report configuration
+//------------------------------------------------------------------------
+
+[[yaml-format-report-options]]
+
+.Keys of a map to specify the report generated for a rule
+[cols="2,1,5",options="header"]
+|===
+
+| Key
+| Cardinality
+| Description
+
+| `primaryColumn`
+| 0..1
+| The column to be used specify the primary column used to
+  generate the report.
+
+  If the primary column has not been specified, the first column
+  of the result set will be choosen as primary column.
+
+| `properties`
+| 0..1
+| A sequence of properties passed to the specified report plugin,
+  given as a map of key-value-pairs.
+
+| `type`
+| 0..1
+| Specifies the report plugin to be used to generate the report
+
+|===
+
 
 
