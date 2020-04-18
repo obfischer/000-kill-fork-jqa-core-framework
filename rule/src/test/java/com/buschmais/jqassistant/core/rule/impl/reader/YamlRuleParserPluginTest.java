@@ -89,86 +89,6 @@ class YamlRuleParserPluginTest {
         }
 
         @Test
-        void oneConceptVerificationWithoutAnyStratefy() throws RuleException {
-            RuleSet ruleSet = readRuleSet("/yaml/concept-single-with-verification-without-strategy.yaml");
-
-            Concept concept = ruleSet.getConceptBucket().getAll().iterator().next();
-
-            assertThat(concept.getVerification()).isNull();
-        }
-
-        @Test
-        void oneConceptVerificationAggregation() throws Exception {
-            RuleSet ruleSet = readRuleSet("/yaml/concept-single-with-verification-aggregation.yaml");
-
-            Concept concept = ruleSet.getConceptBucket().getAll().iterator().next();
-
-            assertThat(concept.getVerification()).isNotNull();
-
-            Verification verification = concept.getVerification();
-
-            assertThat(verification).isInstanceOf(AggregationVerification.class);
-
-            AggregationVerification aggregationVerification = AggregationVerification.class.cast(verification);
-
-            assertThat(aggregationVerification.getMax()).isEqualTo(20);
-            assertThat(aggregationVerification.getMin()).isEqualTo(10);
-            assertThat(aggregationVerification.getColumn()).isEqualTo("Throwables");
-        }
-
-        @Test
-        void oneConceptVerificationAggregationWithoutAnyKeyword() throws Exception {
-            RuleSet ruleSet = readRuleSet("/yaml/concept-single-with-verification-aggregation-without-any-keyword.yaml");
-
-            Concept concept = ruleSet.getConceptBucket().getAll().iterator().next();
-
-            assertThat(concept.getVerification()).isNotNull();
-
-            Verification verification = concept.getVerification();
-
-            assertThat(verification).isInstanceOf(AggregationVerification.class);
-
-            AggregationVerification aggregationVerification = AggregationVerification.class.cast(verification);
-
-            assertThat(aggregationVerification.getMax()).isNull();
-            assertThat(aggregationVerification.getMin()).isNull();
-            assertThat(aggregationVerification.getColumn()).isNull();
-        }
-
-        @Test
-        void oneConceptVerificationRowCount() throws Exception {
-            RuleSet ruleSet = readRuleSet("/yaml/concept-single-with-verification-rowcount.yaml");
-
-            Concept concept = ruleSet.getConceptBucket().getAll().iterator().next();
-
-            Verification verification = concept.getVerification();
-
-            assertThat(verification).isInstanceOf(RowCountVerification.class);
-
-            RowCountVerification rowCountVerification = RowCountVerification.class.cast(verification);
-
-            assertThat(rowCountVerification.getMax()).isEqualTo(20);
-            assertThat(rowCountVerification.getMin()).isEqualTo(10);
-        }
-
-        @Test
-        void oneConceptVerificationRowCountNeitherMaxNorMin() throws Exception {
-            RuleSet ruleSet = readRuleSet("/yaml/concept-single-with-verification-rowcount-without-max-min.yaml");
-
-            Concept concept = ruleSet.getConceptBucket().getAll().iterator().next();
-
-            Verification verification = concept.getVerification();
-
-            assertThat(verification).isInstanceOf(RowCountVerification.class);
-
-            RowCountVerification rowCountVerification = RowCountVerification.class.cast(verification);
-
-            assertThat(rowCountVerification.getMax()).isNull();
-            assertThat(rowCountVerification.getMin()).isNull();
-        }
-
-
-        @Test
         void oneConceptWithMissingKeywordId() {
             assertThatThrownBy(() -> readRuleSet("/yaml/concept-single-with-missing-keyword-id.yaml"))
                 .hasNoCause()
@@ -741,6 +661,69 @@ class YamlRuleParserPluginTest {
     @Nested
     class VerificationRelated {
         @Test
+        void rowCountWithAllKeys() throws Exception {
+            RuleSet ruleSet = readRuleSet("/yaml/concept-single-with-verification-rowcount.yaml");
+
+            Concept concept = ruleSet.getConceptBucket().getAll().iterator().next();
+
+            Verification verification = concept.getVerification();
+
+            assertThat(verification).isInstanceOf(RowCountVerification.class);
+
+            RowCountVerification rowCountVerification = RowCountVerification.class.cast(verification);
+
+            assertThat(rowCountVerification.getMax()).isEqualTo(20);
+            assertThat(rowCountVerification.getMin()).isEqualTo(10);
+        }
+
+        @Test
+        void aggregationWithoutAnyKeyword() throws Exception {
+            RuleSet ruleSet = readRuleSet("/yaml/concept-single-with-verification-aggregation-without-any-keyword.yaml");
+
+            Concept concept = ruleSet.getConceptBucket().getAll().iterator().next();
+
+            assertThat(concept.getVerification()).isNotNull();
+
+            Verification verification = concept.getVerification();
+
+            assertThat(verification).isInstanceOf(AggregationVerification.class);
+
+            AggregationVerification aggregationVerification = AggregationVerification.class.cast(verification);
+
+            assertThat(aggregationVerification.getMax()).isNull();
+            assertThat(aggregationVerification.getMin()).isNull();
+            assertThat(aggregationVerification.getColumn()).isNull();
+        }
+
+        @Test
+        void aggregationWithAllKeys() throws Exception {
+            RuleSet ruleSet = readRuleSet("/yaml/concept-single-with-verification-aggregation.yaml");
+
+            Concept concept = ruleSet.getConceptBucket().getAll().iterator().next();
+
+            assertThat(concept.getVerification()).isNotNull();
+
+            Verification verification = concept.getVerification();
+
+            assertThat(verification).isInstanceOf(AggregationVerification.class);
+
+            AggregationVerification aggregationVerification = AggregationVerification.class.cast(verification);
+
+            assertThat(aggregationVerification.getMax()).isEqualTo(20);
+            assertThat(aggregationVerification.getMin()).isEqualTo(10);
+            assertThat(aggregationVerification.getColumn()).isEqualTo("Throwables");
+        }
+
+        @Test
+        void withoutAnyStratefy() throws RuleException {
+            RuleSet ruleSet = readRuleSet("/yaml/concept-single-with-verification-without-strategy.yaml");
+
+            Concept concept = ruleSet.getConceptBucket().getAll().iterator().next();
+
+            assertThat(concept.getVerification()).isNull();
+        }
+
+        @Test
         void unsupportedKeyword() {
             String messageRegex = "^Rule source '[^']+' contains the unknown " +
                                   "keyword 'unsupportedKeyWord' at " +
@@ -762,6 +745,23 @@ class YamlRuleParserPluginTest {
                 .isExactlyInstanceOf(RuleException.class)
                 .hasMessageMatching(messageRegex);
         }
+
+        @Test
+        void rowCountNeitherMaxNorMin() throws Exception {
+            RuleSet ruleSet = readRuleSet("/yaml/concept-single-with-verification-rowcount-without-max-min.yaml");
+
+            Concept concept = ruleSet.getConceptBucket().getAll().iterator().next();
+
+            Verification verification = concept.getVerification();
+
+            assertThat(verification).isInstanceOf(RowCountVerification.class);
+
+            RowCountVerification rowCountVerification = RowCountVerification.class.cast(verification);
+
+            assertThat(rowCountVerification.getMax()).isNull();
+            assertThat(rowCountVerification.getMin()).isNull();
+        }
+
     }
 
 
