@@ -2,10 +2,9 @@
 concepts:
   - id: java:Throwable
     description: Labels types deriving from java.lang.Throwable as "Throwable".
-    requiresParameters:
-      - name: fqcn
-        defaultValue: foobar
-
+    requiresConcepts:
+      - refId: concept:other
+        optional: false
     source: |
       match
         (throwable)-[:EXTENDS*]->(t:Type)
@@ -15,4 +14,6 @@ concepts:
         throwable:Throwable
       return
         count(throwable) AS Throwables
+    verify:
+      aggregation:
 

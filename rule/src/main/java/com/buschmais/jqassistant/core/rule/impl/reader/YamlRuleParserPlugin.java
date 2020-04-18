@@ -10,6 +10,7 @@ import com.buschmais.jqassistant.core.rule.api.model.*;
 import com.buschmais.jqassistant.core.rule.api.model.Parameter.Type;
 import com.buschmais.jqassistant.core.rule.api.reader.AggregationVerification;
 import com.buschmais.jqassistant.core.rule.api.reader.RowCountVerification;
+import com.buschmais.jqassistant.core.rule.api.reader.RowCountVerification.RowCountVerificationBuilder;
 import com.buschmais.jqassistant.core.rule.api.source.RuleSource;
 
 import org.snakeyaml.engine.v2.api.Load;
@@ -279,33 +280,35 @@ public class YamlRuleParserPlugin extends AbstractRuleParserPlugin {
          */
         Verification verification = null;
 
-        if (map.containsKey(VERIFY)) {
+        if (map.get(VERIFY) != null) {
             Map<String, Map<String, Object>> verify = (Map<String, Map<String, Object>>) map.get(VERIFY);
 
             boolean hasAggregation = verify.containsKey(AGGREGATION);
+            boolean hasRowCount = verify.containsKey(ROW_COUNT);
 
             if (hasAggregation) {
-                Map<String, Object> config = verify.get(AGGREGATION);
+                Optional<Map<String, Object>> config = ofNullable(verify.get(AGGREGATION));
+                AggregationVerification.AggregationVerificationBuilder builder = AggregationVerification.builder();
 
-                String columnName = (String) config.get(AGGREGATION_COLUMN);
-                Integer min = (Integer) config.get(AGGREGATION_MIN);
-                Integer max = (Integer) config.get(AGGREGATION_MAX);
+                config.ifPresent(values -> {
+                    ofNullable(values.get(AGGREGATION_COLUMN)).ifPresent(value -> builder.column((String) value));
+                    ofNullable(values.get(AGGREGATION_MAX)).ifPresent(value -> builder.max((Integer) value));
+                    ofNullable(values.get(AGGREGATION_MIN)).ifPresent(value -> builder.min((Integer) value));
+                });
 
-                verification = AggregationVerification.builder()
-                                                      .column(columnName)
-                                                      .min(min)
-                                                      .max(max)
-                                                      .build();
-            } else {
-                Map<String, Object> config = verify.get(ROW_COUNT);
+                verification = builder.build();
+            }
 
-                Integer min = (Integer) config.get(ROW_COUNT_MIN);
-                Integer max = (Integer) config.get(ROW_COUNT_MAX);
+            if (hasRowCount) {
+                Optional<Map<String, Object>> config = ofNullable(verify.get(ROW_COUNT));
+                RowCountVerificationBuilder builder = RowCountVerification.builder();
 
-                verification = RowCountVerification.builder()
-                                                   .min(min)
-                                                   .max(max)
-                                                   .build();
+                config.ifPresent(values -> {
+                    ofNullable(values.get(ROW_COUNT_MIN)).ifPresent(value -> builder.min((Integer) value));
+                    ofNullable(values.get(ROW_COUNT_MAX)).ifPresent(value -> builder.max((Integer) value));
+                });
+
+                verification = builder.build();
             }
         }
 

@@ -3,6 +3,26 @@
   "$schema" : "https://json-schema.org/draft/2019-09/schema",
   "title" : "jQAssistant Rules Version 1.8",
   "$defs" : {
+    "aggregationJSch": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "max": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "min": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "column": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        { "type": "null" }
+      ]
+    },
 
     "idJSch" : { "type" : "string" },
 
@@ -46,7 +66,7 @@
           "description" : { "type" : "string" },
           "report" : {
             "anyOf" : [
-              { "$ref" : "#/$defs/reportJScn" },
+              { "$ref" : "#/$defs/reportJSch" },
               { "type" : "null" }
             ]
           },
@@ -83,54 +103,22 @@
           "language" : { "type" : "string" },
           "source" : { "$ref" : "#/$defs/sourceJSch" },
           "verify" : {
-            "type" : "object",
-            "properties" : {
-              "rowCount" : {
+            "anyOf": [
+              {
                 "type" : "object",
                 "properties" : {
-                  "min" : {
-                    "type" : "integer",
-                    "minimum" : 0
-                  },
-                  "max" : {
-                    "type" : "integer",
-                    "minimum" : 0
-                  }
+                  "rowCount": { "$ref": "#/$defs/rowCountJSch" },
+                  "aggregation": { "$ref": "#/$defs/aggregationJSch" }
                 },
-                "anyOf": [
-                  { "required": [ "min" ] },
-                  { "required": [ "max" ] },
-                  { "required": [ "max", "min" ] }
+                "oneOf": [
+                  { "required": [ "aggregation" ] },
+                  { "required": [ "rowCount" ] }
                 ],
+
                 "additionalProperties" : false
               },
-              "aggregation" : {
-                "type" : "object",
-                "properties" : {
-                  "max": {
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "min": {
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "column": { "type": "string" }
-                },
-                "anyOf": [
-                  { "required": ["column", "min", "max"] },
-                  { "required": ["column", "min" ] },
-                  { "required": ["column", "max" ] }
-                ],
-                "additionalProperties" : false
-              }
-            },
-            "oneOf": [
-              { "required": [ "aggregation" ] },
-              { "required": [ "rowCount" ] }
-            ],
-
-            "additionalProperties" : false
+              { "type": "null" }
+            ]
           }
         },
         "required" : [ "id", "source" ],
@@ -138,7 +126,7 @@
       },
       "additionalProperties" : false
     },
-    "reportJScn" : {
+    "reportJSch" : {
       "type" : "object",
       "properties" : {
         "primaryColumn" : {
@@ -163,6 +151,26 @@
       },
       "required": [ "primaryColumn", "type" ],
       "additionalProperties" : false
+    },
+
+    "rowCountJSch": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        { "type": "null" }
+      ]
     }
   },
   "anyOf": [

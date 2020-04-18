@@ -15,8 +15,5 @@ concepts:
       return
         count(throwable) AS Throwables
     verify:
-      aggregation:
-        column: Throwables
-        min: 10
-        max: 20
+      rowCount:
 
