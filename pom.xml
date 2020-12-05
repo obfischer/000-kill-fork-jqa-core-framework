@@ -47,7 +47,7 @@
         <jqa-own-constraints.version>1.10.0-SNAPSHOT</jqa-own-constraints.version>
         <jqa-neo4jbackend.version>1.10.0-SNAPSHOT</jqa-neo4jbackend.version>
         <json-schema-validator.version>1.0.36</json-schema-validator.version>
-        <org.hamcrest.version>2.0.0.0</org.hamcrest.version>
+        <org.hamcrest.version>2.2</org.hamcrest.version>
         <org.asciidoctor.version>1.5.8.1</org.asciidoctor.version>
         <org.asciidoctor-plugin.version>1.5.8</org.asciidoctor-plugin.version>
         <org.asciidoctorj-diagram.version>1.5.18</org.asciidoctorj-diagram.version>
@@ -60,11 +60,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.buschmais.jqassistant.neo4jserver</groupId>
-                <artifactId>bootstrap</artifactId>
-                <version>${jqa-neo4jbackend.version}</version>
-            </dependency>
             <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
@@ -110,7 +105,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
-                <artifactId>java-hamcrest</artifactId>
+                <artifactId>hamcrest</artifactId>
                 <version>${org.hamcrest.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -119,11 +114,6 @@
                 <artifactId>mockito-junit-jupiter</artifactId>
                 <version>${org.mockito.version}</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jaxb</groupId>
-                <artifactId>jaxb-runtime</artifactId>
-                <version>${org.glassfish.jaxb.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.asciidoctor</groupId>
@@ -182,25 +172,12 @@
                         <quiet>true</quiet>
                         <detectLinks>false</detectLinks>
                         <detectOfflineLinks>false</detectOfflineLinks>
-                        <additionalOptions>
-                            <additionalOption>-Xdoclint:none</additionalOption>
-                            <additionalOption>--base-dir ${project.basedir}</additionalOption>
-                        </additionalOptions>
                         <groups>
                             <group>
                                 <title>Public API</title>
                                 <packages>com.buschmais.jqassistant.core.${project.artifactId}.api*</packages>
                             </group>
                         </groups>
-
-                        <source>1.8</source>
-                        <doclet>org.asciidoctor.Asciidoclet</doclet>
-                        <docletArtifact>
-                            <groupId>org.asciidoctor</groupId>
-                            <artifactId>asciidoclet</artifactId>
-                            <version>1.5.4</version>
-                        </docletArtifact>
-                        <!--<overview>src/main/java/overview.adoc</overview>-->
                     </configuration>
                 </plugin>
             </plugins>
@@ -356,3 +333,4 @@
     </pluginRepositories>
 
 </project>
+

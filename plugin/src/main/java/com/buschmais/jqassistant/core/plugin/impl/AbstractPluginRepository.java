@@ -66,10 +66,9 @@ public abstract class AbstractPluginRepository {
     protected <T> T createInstance(String typeName) {
         Class<T> type = getType(typeName.trim());
         try {
-            return type.newInstance();
-        } catch (ReflectiveOperationException e) {
+            return type.getDeclaredConstructor().newInstance();
+        } catch (LinkageError | ReflectiveOperationException e) {
             throw new PluginRepositoryException("Cannot load or create instance of class " + type.getName(), e);
         }
     }
-
 }

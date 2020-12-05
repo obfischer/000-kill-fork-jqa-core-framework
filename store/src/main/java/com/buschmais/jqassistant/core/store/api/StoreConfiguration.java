@@ -3,7 +3,7 @@ package com.buschmais.jqassistant.core.store.api;
 import java.net.URI;
 import java.util.Properties;
 
-import com.buschmais.jqassistant.neo4j.backend.bootstrap.EmbeddedNeo4jConfiguration;
+import com.buschmais.jqassistant.neo4j.embedded.EmbeddedNeo4jConfiguration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

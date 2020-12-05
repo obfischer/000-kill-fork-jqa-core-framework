@@ -1,25 +1,22 @@
 package com.buschmais.jqassistant.core.store.impl;
 
-import java.util.Iterator;
 import java.util.Properties;
-import java.util.ServiceLoader;
 
 import com.buschmais.jqassistant.core.store.api.Store;
 import com.buschmais.jqassistant.core.store.api.StoreConfiguration;
 import com.buschmais.jqassistant.core.store.spi.StorePluginRepository;
-import com.buschmais.jqassistant.neo4j.backend.bootstrap.EmbeddedNeo4jConfiguration;
-import com.buschmais.jqassistant.neo4j.backend.bootstrap.EmbeddedNeo4jServer;
-import com.buschmais.jqassistant.neo4j.backend.bootstrap.EmbeddedNeo4jServerFactory;
-import com.buschmais.xo.api.XOManager;
+import com.buschmais.jqassistant.neo4j.embedded.EmbeddedNeo4jConfiguration;
+import com.buschmais.jqassistant.neo4j.embedded.EmbeddedNeo4jServer;
+import com.buschmais.jqassistant.neo4j.embedded.EmbeddedNeo4jServerFactory;
+import com.buschmais.jqassistant.neo4j.embedded.neo4jv4.Neo4jV4ServerFactory;
 import com.buschmais.xo.api.XOManagerFactory;
 import com.buschmais.xo.api.bootstrap.XOUnit;
-import com.buschmais.xo.neo4j.embedded.api.EmbeddedNeo4jDatastoreSession;
 import com.buschmais.xo.neo4j.embedded.api.EmbeddedNeo4jXOProvider;
+import com.buschmais.xo.neo4j.embedded.impl.datastore.EmbeddedNeo4jDatastore;
 
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.dbms.api.DatabaseManagementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * {@link Store} implementation using an embedded Neo4j instance.
@@ -32,22 +29,17 @@ public class EmbeddedGraphStore extends AbstractGraphStore {
 
     private EmbeddedNeo4jServerFactory serverFactory;
 
-    private EmbeddedNeo4jServer server;
-
     private EmbeddedNeo4jConfiguration embeddedNeo4jConfiguration;
 
     /**
      * Constructor.
      *
-     * @param configuration The configuration.
+     * @param configuration
+     *            The configuration.
      */
     public EmbeddedGraphStore(StoreConfiguration configuration, StorePluginRepository storePluginRepository) {
         super(configuration, storePluginRepository);
-        this.serverFactory = getEmbeddedNeo4jServerFactory();
-    }
-
-    public EmbeddedNeo4jServer getServer() {
-        return this.server;
+        this.serverFactory = new Neo4jV4ServerFactory();
     }
 
     @Override
@@ -64,23 +56,11 @@ public class EmbeddedGraphStore extends AbstractGraphStore {
 
     @Override
     protected void initialize(XOManagerFactory xoManagerFactory) {
-        this.server = serverFactory.getServer();
+        EmbeddedNeo4jServer server = serverFactory.getServer();
+        EmbeddedNeo4jDatastore embeddedNeo4jDatastore = xoManagerFactory.getDatastore(EmbeddedNeo4jDatastore.class);
+        DatabaseManagementService managementService = embeddedNeo4jDatastore.getManagementService();
         LOGGER.info("Initializing embedded Neo4j server " + server.getVersion());
-        try (XOManager xoManager = xoManagerFactory.createXOManager()) {
-            GraphDatabaseService graphDatabaseService = xoManager.getDatastoreSession(EmbeddedNeo4jDatastoreSession.class).getGraphDatabaseService();
-            server.initialize(graphDatabaseService, embeddedNeo4jConfiguration, storePluginRepository.getProcedureTypes(),
-                    storePluginRepository.getFunctionTypes());
-        }
-    }
-
-    private EmbeddedNeo4jServerFactory getEmbeddedNeo4jServerFactory() {
-        ServiceLoader<EmbeddedNeo4jServerFactory> serverFactories = ServiceLoader.load(EmbeddedNeo4jServerFactory.class);
-        Iterator<EmbeddedNeo4jServerFactory> iterator = serverFactories.iterator();
-        if (iterator.hasNext()) {
-            return iterator.next();
-        } else {
-            throw new IllegalStateException("Cannot find server factory.");
-        }
+        server.initialize(managementService, embeddedNeo4jConfiguration, storePluginRepository.getProcedureTypes(), storePluginRepository.getFunctionTypes());
     }
 
     @Override

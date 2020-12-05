@@ -1,15 +1,27 @@
 package com.buschmais.jqassistant.core.rule.api.executor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.buschmais.jqassistant.core.rule.api.model.*;
+import com.buschmais.jqassistant.core.rule.api.model.Concept;
+import com.buschmais.jqassistant.core.rule.api.model.Constraint;
+import com.buschmais.jqassistant.core.rule.api.model.ExecutableRule;
+import com.buschmais.jqassistant.core.rule.api.model.Group;
+import com.buschmais.jqassistant.core.rule.api.model.RuleException;
+import com.buschmais.jqassistant.core.rule.api.model.RuleSelection;
+import com.buschmais.jqassistant.core.rule.api.model.RuleSet;
+import com.buschmais.jqassistant.core.rule.api.model.Severity;
+import com.buschmais.jqassistant.core.rule.api.model.SeverityRule;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Controls execution of {@link RuleSet}s.
- * <p/>
+ * <p>
  * Execution order is determined by
  * <ul>
  * <li>Declared dependencies between rules, i.e. required concepts</li>

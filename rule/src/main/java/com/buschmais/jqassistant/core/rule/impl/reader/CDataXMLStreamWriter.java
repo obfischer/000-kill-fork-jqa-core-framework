@@ -8,7 +8,7 @@ import javax.xml.stream.XMLStreamWriter;
 /**
  * A {@link XMLStreamWriter} which transparently writes CDATA blocks if
  * special characters are detected.
- * 
+ *
  * @see http://blog.mi-ernst.de/2012/05/04/jaxb-and-cdata-sections[JAXB and CDATA Sections^]
  */
 public class CDataXMLStreamWriter extends AbstractStreamWriterDelegate {
