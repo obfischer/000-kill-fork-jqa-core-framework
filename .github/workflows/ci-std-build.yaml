@@ -2,7 +2,7 @@ name: 'jQA Standard CI Build'
 
 on:
   workflow_dispatch:
-    
+
   #push:
   #  branches:
   #    - master
@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: "Greeting"
-        shell: |-
+        run: |-
           echo hi
           
 
