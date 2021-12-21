@@ -19,10 +19,19 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '8'
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: jqa-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            jqa-${{ runner.os }}-maven-
+
+        ${{ runner.os }}-maven-
       - name: "Greeting"
         shell: bash
-        run: |-
-          echo hi
+        run: |
+          mvn -DskipTests -Djqassistant.skip=true clean install
           
 
 #    runs-on: ubuntu-latest
