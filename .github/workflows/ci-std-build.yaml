@@ -27,7 +27,6 @@ jobs:
           restore-keys: |
             jqa-${{ runner.os }}-maven-
 
-        ${{ runner.os }}-maven-
       - name: "Greeting"
         shell: bash
         run: |
