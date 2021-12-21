@@ -15,6 +15,7 @@ jobs:
 
     steps:
       - name: "Greeting"
+        shell: bash
         run: |-
           echo hi
           
