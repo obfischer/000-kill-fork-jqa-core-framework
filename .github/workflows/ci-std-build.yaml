@@ -11,6 +11,7 @@ on:
 
 jobs:
   ci:
+    name: Babaluba
     runs-on: ubuntu-latest
 
     steps:
@@ -30,7 +31,7 @@ jobs:
       - name: "Greeting"
         shell: bash
         run: |
-          mvn -DskipTests -Djqassistant.skip=true clean install
+          mvn --no-transfer-progress -DskipTests -Djqassistant.skip=true clean install
           
 
 #    runs-on: ubuntu-latest
