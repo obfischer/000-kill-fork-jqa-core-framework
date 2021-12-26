@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Build the project on the reference platform. Currently the reference plattform is OpenJDK 8 on
+  # Build the project on the reference platform. Currently, the reference plattform is OpenJDK 8 on
   # Linux. If the build, including tests, is successful, we can go on testing the code on other
   # platforms and JDKs
   reference_build:
