@@ -1,0 +1,79 @@
+name: jQA Standard CI Build
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build with Java ${{ matrix.java-version }} (${{ matrix.distribution }}) on ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        distribution: [temurin, adopt-openj9, zulu]
+        java-version: [ 8 ]
+        os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: ${{ matrix.distribution }}
+
+      - name: Show Java version
+        shell: bash
+        run: java -version
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-          
+
+      - name: Compile only
+        shell: bash
+        run:
+          mvn 
+            -DskipTests=true -DskipITs=true -Djqassistant.skip=true 
+            --batch-mode --no-transfer-progress 
+            clean package
+
+      - name: Run Unit Tests
+        shell: bash
+        run:
+          mvn
+            -DskipTests=false -DskipITs=true -Djqassistant.skip=true 
+            --batch-mode --no-transfer-progress 
+            clean package
+
+      - name: Run Integration Tests
+        shell: bash
+        run:
+          mvn
+            -DskipTests=true -DskipITs=false -Djqassistant.skip=true 
+            --batch-mode --no-transfer-progress 
+            clean package
+
+      - name: Run jQA Analysis and Verification
+        shell: bash
+        run:
+          mvn
+            -DskipTests=true -DskipITs=true -Djqassistant.skip=false 
+            --batch-mode --no-transfer-progress 
+            clean package
+
+
+
