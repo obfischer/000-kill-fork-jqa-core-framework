@@ -16,6 +16,7 @@ jobs:
   reference_build:
     name: Reference build with Java ${{ matrix.java-version }} (${{ matrix.distribution }}) on ${{ matrix.os }}
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     strategy:
       fail-fast: false
@@ -77,6 +78,79 @@ jobs:
             -DskipTests=true -DskipITs=true -Djqassistant.skip=false 
             --batch-mode --no-transfer-progress 
             clean package
+
+  compatiblity_test:
+    name: Compatibility test with Java ${{ matrix.java-version }} (${{ matrix.distribution }}) on ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: [ reference_build ]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        distribution: [temurin, adopt-openj9, zulu]
+        java-version: [ 8 ]
+        os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
+        exclude:
+          # Exclude the reference build configuration
+          - os: ubuntu-latest
+            java-version: 8
+            distribution: temurin
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: ${{ matrix.distribution }}
+
+      - name: Show Java version
+        shell: bash
+        run: java -version
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-          
+
+      - name: Compile only
+        shell: bash
+        run:
+          mvn
+          -DskipTests=true -DskipITs=true -Djqassistant.skip=true
+          --batch-mode --no-transfer-progress
+          clean package
+
+      - name: Run Unit Tests
+        shell: bash
+        run:
+          mvn
+          -DskipTests=false -DskipITs=true -Djqassistant.skip=true
+          --batch-mode --no-transfer-progress
+          clean package
+
+      - name: Run Integration Tests
+        shell: bash
+        run:
+          mvn
+          -DskipTests=true -DskipITs=false -Djqassistant.skip=true
+          --batch-mode --no-transfer-progress
+          clean package
+
+      - name: Run jQA Analysis and Verification
+        shell: bash
+        run:
+          mvn
+          -DskipTests=true -DskipITs=true -Djqassistant.skip=false
+          --batch-mode --no-transfer-progress
+          clean package
+
 
 
 
